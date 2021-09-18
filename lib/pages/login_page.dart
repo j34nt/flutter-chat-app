@@ -1,8 +1,11 @@
+import 'package:chat_app/helpers/show_alert.dart';
+import 'package:chat_app/services/auth_services.dart';
 import 'package:chat_app/widgets/btn_blue.dart';
 import 'package:chat_app/widgets/custom_input.dart';
 import 'package:chat_app/widgets/labels.dart';
 import 'package:chat_app/widgets/logo.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 
 class LoginPage extends StatelessWidget {
@@ -43,6 +46,7 @@ class __FormState extends State<_Form> {
   final passCtrl = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
     return Container(
       margin: EdgeInsets.only(top:40),
       padding: EdgeInsets.symmetric(horizontal: 50),
@@ -65,10 +69,17 @@ class __FormState extends State<_Form> {
           //TODO create button
           BtnBlue(
             text: 'Ingrese',
-            onPress: (){
-              print(emailCtrl);
-              print(passCtrl);
-            },
+            onPress: authService.isAuth ? null : () async { 
+              FocusScope.of(context).unfocus();
+              final loginOk = await authService.login(emailCtrl.text.trim(), passCtrl.text.trim());
+              if(loginOk) {
+                // TODO Connect to socket server
+                Navigator.pushReplacementNamed(context, 'users');
+              } else {
+                // show alert
+                showAlert(context, 'Login Incorrecto', 'Revise sus credenciales');
+              }
+            }
           )
          ],
        ),

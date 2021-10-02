@@ -1,5 +1,6 @@
 import 'package:chat_app/helpers/show_alert.dart';
 import 'package:chat_app/services/auth_services.dart';
+import 'package:chat_app/services/socket_service.dart';
 import 'package:chat_app/widgets/btn_blue.dart';
 import 'package:chat_app/widgets/custom_input.dart';
 import 'package:chat_app/widgets/labels.dart';
@@ -48,6 +49,7 @@ class __FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
     return Container(
       margin: EdgeInsets.only(top:40),
       padding: EdgeInsets.symmetric(horizontal: 50),
@@ -72,14 +74,12 @@ class __FormState extends State<_Form> {
              isPassword: true,
            ),
 
-
-          //TODO create button
           BtnBlue(
             text: 'Registrar',
             onPress: authService.isAuth ? null : () async {
               final registerOk = await authService.register(nameCtrl.text, emailCtrl.text.trim(), passCtrl.text.trim());
               if(registerOk == true) {
-                // TODO Connect to socket server
+                socketService.connect();
                 Navigator.pushReplacementNamed(context, 'users');
               } else {
                 // show alert
